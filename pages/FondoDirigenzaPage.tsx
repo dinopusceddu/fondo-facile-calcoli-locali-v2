@@ -1,3 +1,4 @@
+
 // pages/FondoDirigenzaPage.tsx
 import React, { useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.js';
@@ -119,7 +120,7 @@ export const FondoDirigenzaPage: React.FC = () => {
         payload: { lim_totaleParzialeRisorseConfrontoTetto2016: isNaN(lim_totaleParzialeRisorseConfrontoTetto2016_calculated) ? 0 : lim_totaleParzialeRisorseConfrontoTetto2016_calculated }
       });
     }
-  }, [data.lim_totaleParzialeRisorseConfrontoTetto2016, lim_totaleParzialeRisorseConfrontoTetto2016_calculated, dispatch]); // Corrected dependency
+  }, [data.lim_totaleParzialeRisorseConfrontoTetto2016, lim_totaleParzialeRisorseConfrontoTetto2016_calculated, dispatch]);
   
   const totaleRisorseEffettivamenteDisponibili = 
     sommaRisorseStabili + 
@@ -174,4 +175,9 @@ export const FondoDirigenzaPage: React.FC = () => {
             </span>
         </div>
         <p className="text-xs text-center text-[#1b0e0e] mt-2">
-            Calcolato come: (Somma Stabili + Somma Variabili) + Adeguamento T
+            Calcolato come: (Somma Risorse Stabili + Somma Risorse Variabili) + Adeguamento Annuale Tetto 2016 - Misure Mancato Rispetto Vincoli.
+        </p>
+      </Card>
+    </div>
+  );
+};
