@@ -75,7 +75,7 @@ const AppContent: React.FC = () => {
           <p className="text-lg text-[#1b0e0e] mb-2">Impossibile caricare la sezione richiesta: <strong className="text-[#ea2832]">{state.activeTab}</strong>.</p>
           <p className="text-sm text-[#5f5252]">
             Questo problema può essere causato da un errore nell'importazione di un modulo della pagina o una sua dipendenza. 
-            Controllare la console del browser (Tasto F12 o Ispeziona Elemento -> Console) per ulteriori dettagli specifici sull'errore.
+            Controllare la console del browser (Tasto F12 o Ispeziona Elemento -&gt; Console) per ulteriori dettagli specifici sull'errore.
             Potrebbe essere necessario correggere le estensioni dei file negli import (es. usare .tsx o .ts invece di .js) all'interno del modulo problematico.
           </p>
           {activeModule && <p className="text-sm text-[#5f5252] mt-2">Modulo attivo tentato: {activeModule.name} (ID: {activeModule.id})</p>}
