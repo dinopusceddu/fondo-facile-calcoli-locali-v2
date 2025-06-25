@@ -330,6 +330,6 @@ export type AppAction =
 export interface PageModule {
   id: string;
   name: string;
-  icon: React.ReactNode; 
+  icon?: React.ReactNode; // Icon is now optional
   component: React.FC;
 }

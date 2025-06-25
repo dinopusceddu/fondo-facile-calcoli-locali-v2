@@ -1,7 +1,7 @@
 // constants.ts
 import { EmployeeCategory, UserRole, TipologiaEnte, SimulatoreIncrementoInput, FondoAccessorioDipendenteData, FondoElevateQualificazioniData, FondoSegretarioComunaleData, FondoDirigenzaData } from './types.js';
 
-export const APP_NAME = "Costituzione del Fondo FL";
+export const APP_NAME = "Salario accessorio Funzioni Locali";
 
 export const DEFAULT_CURRENT_YEAR = new Date().getFullYear();
 

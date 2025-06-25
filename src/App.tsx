@@ -1,34 +1,34 @@
 // src/App.tsx
 import React, { useEffect } from 'react';
 
-// Importazioni aggiornate per puntare alle directory corrette
-import { HomePage } from '../pages/HomePage.js';
-import { DataEntryPage } from '../pages/DataEntryPage.js';
-import { FundDetailsPage } from '../pages/FundDetailsPage.js';
-import { CompliancePage } from '../pages/CompliancePage.js';
-import { ReportsPage } from '../pages/ReportsPage.js';
-import { FondoAccessorioDipendentePage } from '../pages/FondoAccessorioDipendentePage.js';
-import { FondoElevateQualificazioniPage } from '../pages/FondoElevateQualificazioniPage.js';
-import { FondoSegretarioComunalePage } from '../pages/FondoSegretarioComunalePage.js';
-import { FondoDirigenzaPage } from '../pages/FondoDirigenzaPage.js'; 
+// Importazioni aggiornate per puntare alle directory corrette e con estensione corretta
+import { HomePage } from '../pages/HomePage.tsx';
+import { DataEntryPage } from '../pages/DataEntryPage.tsx';
+import { FundDetailsPage } from '../pages/FundDetailsPage.tsx';
+import { CompliancePage } from '../pages/CompliancePage.tsx';
+import { ReportsPage } from '../pages/ReportsPage.tsx';
+import { FondoAccessorioDipendentePage } from '../pages/FondoAccessorioDipendentePage.tsx';
+import { FondoElevateQualificazioniPage } from '../pages/FondoElevateQualificazioniPage.tsx';
+import { FondoSegretarioComunalePage } from '../pages/FondoSegretarioComunalePage.tsx';
+import { FondoDirigenzaPage } from '../pages/FondoDirigenzaPage.tsx'; 
 
-import { AppProvider, useAppContext } from '../contexts/AppContext.js';
-import { MainLayout } from '../components/layout/MainLayout.js';
-import { PageModule } from '../types.js';
-import { LoadingSpinner } from '../components/shared/LoadingSpinner.js';
+import { AppProvider, useAppContext } from '../contexts/AppContext.tsx';
+import { MainLayout } from '../components/layout/MainLayout.tsx';
+import { PageModule } from '../types.ts';
+import { LoadingSpinner } from '../components/shared/LoadingSpinner.tsx';
 
 
 const allPageModules: PageModule[] = [
-  { id: 'dashboard', name: 'Dashboard', icon: '📊', component: HomePage },
-  { id: 'dataEntry', name: 'Dati Costituzione Fondo', icon: '📝', component: DataEntryPage },
-  { id: 'fondoAccessorioDipendente', name: 'Fondo Accessorio Personale', icon: '💸', component: FondoAccessorioDipendentePage },
-  { id: 'fondoElevateQualificazioni', name: 'Fondo Elevate Qualificazioni', icon: '🌟', component: FondoElevateQualificazioniPage },
-  { id: 'fondoSegretarioComunale', name: 'Risorse Segretario Comunale', icon: '🧑‍💼', component: FondoSegretarioComunalePage },
-  { id: 'fondoDirigenza', name: 'Fondo Dirigenza', icon: '👔', component: FondoDirigenzaPage }, 
-  { id: 'fundDetails', name: 'Dettaglio Fondo Calcolato', icon: '🔍', component: FundDetailsPage },
-  { id: 'compliance', name: 'Conformità', icon: '⚖️', component: CompliancePage },
-  { id: 'reports', name: 'Report', icon: '📄', component: ReportsPage },
-];
+  { id: 'benvenuto', name: 'Benvenuto!', component: HomePage }, // Renamed
+  { id: 'dataEntry', name: 'Dati Costituzione Fondo', component: DataEntryPage },
+  { id: 'fondoAccessorioDipendente', name: 'Fondo Accessorio Personale', component: FondoAccessorioDipendentePage },
+  { id: 'fondoElevateQualificazioni', name: 'Fondo Elevate Qualificazioni', component: FondoElevateQualificazioniPage },
+  { id: 'fondoSegretarioComunale', name: 'Risorse Segretario Comunale', component: FondoSegretarioComunalePage },
+  { id: 'fondoDirigenza', name: 'Fondo Dirigenza', component: FondoDirigenzaPage }, 
+  { id: 'fundDetails', name: 'Dettaglio Fondo Calcolato', component: FundDetailsPage },
+  { id: 'compliance', name: 'Conformità', component: CompliancePage },
+  { id: 'reports', name: 'Report', component: ReportsPage },
+]; // Icons removed
 
 const AppContent: React.FC = () => {
   const { state, dispatch } = useAppContext();
@@ -43,30 +43,58 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     if (hasDirigenza === false && state.activeTab === 'fondoDirigenza') {
-      dispatch({ type: 'SET_ACTIVE_TAB', payload: 'dashboard' });
+      dispatch({ type: 'SET_ACTIVE_TAB', payload: 'benvenuto' });
     }
   }, [hasDirigenza, state.activeTab, dispatch]);
 
   let activeModule = visiblePageModules.find(mod => mod.id === state.activeTab);
   
   if (!activeModule) {
-    // If current activeTab is not in visiblePageModules (e.g. dirigenza was hidden), default to dashboard
-    activeModule = visiblePageModules.find(mod => mod.id === 'dashboard') || visiblePageModules[0];
-     // Dispatch to update activeTab in state if it was changed due to visibility
+    // Fallback to 'benvenuto' if current activeTab is not in visible modules
+    // or if initial activeTab was somehow invalid.
+    activeModule = visiblePageModules.find(mod => mod.id === 'benvenuto') || visiblePageModules[0];
     if (activeModule && state.activeTab !== activeModule.id) {
-       // Dispatching inside useEffect or after a render cycle is safer,
-       // but for this specific case of immediate redirection/correction:
-       Promise.resolve().then(() => { // Dispatch in a microtask
+       // Use Promise.resolve().then() to schedule the dispatch after the current render cycle
+       // to avoid triggering a new render within a render.
+       Promise.resolve().then(() => { 
            dispatch({ type: 'SET_ACTIVE_TAB', payload: activeModule!.id });
        });
     }
   }
   
-  const ActiveComponent = activeModule.component;
+  const ActiveComponent = activeModule ? activeModule.component : null;
+
+  if (!ActiveComponent) {
+    // This fallback UI will be rendered if ActiveComponent is null or undefined,
+    // which can happen if a page module (e.g., HomePage) failed to import correctly.
+    console.error("Error: ActiveComponent is not defined. This might be due to a failed page import. Active Tab:", state.activeTab, "Resolved Module:", activeModule);
+    return (
+      <MainLayout modules={visiblePageModules}>
+        <div className="p-6 text-center">
+          <h1 className="text-2xl font-bold text-[#ea2832] mb-4">Errore Caricamento Applicazione</h1>
+          <p className="text-lg text-[#1b0e0e] mb-2">Impossibile caricare la sezione richiesta: <strong className="text-[#ea2832]">{state.activeTab}</strong>.</p>
+          <p className="text-sm text-[#5f5252]">
+            Questo problema può essere causato da un errore nell'importazione di un modulo della pagina o una sua dipendenza. 
+            Controllare la console del browser (Tasto F12 o Ispeziona Elemento -> Console) per ulteriori dettagli specifici sull'errore.
+            Potrebbe essere necessario correggere le estensioni dei file negli import (es. usare .tsx o .ts invece di .js) all'interno del modulo problematico.
+          </p>
+          {activeModule && <p className="text-sm text-[#5f5252] mt-2">Modulo attivo tentato: {activeModule.name} (ID: {activeModule.id})</p>}
+          {!activeModule && <p className="text-sm text-[#5f5252] mt-2">Nessun modulo attivo risolto per la tab: {state.activeTab}</p>}
+           <button 
+            onClick={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: 'benvenuto' })}
+            className="mt-6 px-4 py-2 bg-[#ea2832] text-white rounded-md hover:bg-[#c02128] transition-colors"
+          >
+            Torna alla Dashboard
+          </button>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout modules={visiblePageModules}>
-      {state.isLoading && !state.calculatedFund && state.activeTab === 'dashboard' ? ( 
+      {/* Conditionally render loading spinner only for initial load or specific global loading states */}
+      {state.isLoading && (!state.calculatedFund || !activeModule) && state.activeTab === 'benvenuto' ? ( 
         <LoadingSpinner text="Caricamento applicazione..." />
       ) : (
         <ActiveComponent />

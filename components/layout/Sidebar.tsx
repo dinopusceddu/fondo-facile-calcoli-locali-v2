@@ -41,13 +41,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ modules, isOpen, toggleSidebar
               <li key={mod.id} className="mb-1.5"> {/* Slightly reduced margin */}
                 <button
                   onClick={() => handleNav(mod.id)}
-                  className={`w-full flex items-center px-4 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 group
+                  className={`w-full flex items-center px-3 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 group text-left
                     ${state.activeTab === mod.id 
                       ? 'bg-[#f3e7e8] text-[#ea2832]' // Active: light pink bg, red text
                       : 'text-[#1b0e0e] hover:bg-[#f3e7e8] hover:text-[#1b0e0e]' // Default and hover
                     }`}
                 >
-                  <span className={`mr-3 text-lg w-6 text-center ${state.activeTab === mod.id ? 'text-[#ea2832]' : 'text-[#994d51] group-hover:text-[#1b0e0e]'}`}>{mod.icon}</span>
+                  {/* Icon span removed */}
                   {mod.name}
                 </button>
               </li>

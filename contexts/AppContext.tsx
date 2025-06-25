@@ -20,7 +20,7 @@ const initialState: AppState = {
   complianceChecks: [],
   isLoading: false,
   error: undefined,
-  activeTab: 'dashboard',
+  activeTab: 'benvenuto', // Updated initial tab
 };
 
 const AppContext = createContext<{
