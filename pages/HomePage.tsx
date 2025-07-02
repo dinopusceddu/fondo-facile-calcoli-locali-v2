@@ -1,9 +1,6 @@
-
 // pages/HomePage.tsx
 import React, { useState } from 'react';
 import { useAppContext } from '../contexts/AppContext.js';
-import { DashboardSummary } from '../components/dashboard/DashboardSummary.js';
-import { ComplianceStatusWidget } from '../components/dashboard/ComplianceStatusWidget.js';
 import { Button } from '../components/shared/Button.js';
 import { Card } from '../components/shared/Card.js';
 import { TEXTS_UI, INITIAL_FONDO_ACCESSORIO_DIPENDENTE_DATA, INITIAL_FONDO_ELEVATE_QUALIFICAZIONI_DATA, INITIAL_FONDO_SEGRETARIO_COMUNALE_DATA, INITIAL_FONDO_DIRIGENZA_DATA } from '../constants.js';
@@ -233,9 +230,7 @@ export const HomePage: React.FC = () => {
     <div className="space-y-8">
       <div className="flex flex-wrap justify-between items-center gap-4">
         <h2 className="text-[#1b0e0e] tracking-light text-2xl sm:text-[30px] font-bold leading-tight">Benvenuto!</h2>
-        <Button onClick={handleRecalculate} isLoading={isLoading} disabled={isLoading} variant="primary" size="md">
-          {isLoading ? TEXTS_UI.calculating : "Aggiorna Calcoli e Conformità"}
-        </Button>
+        {/* Button removed from here */}
       </div>
       
       {state.error && (
@@ -303,8 +298,11 @@ export const HomePage: React.FC = () => {
         </div>
       </Card>
 
-      <DashboardSummary calculatedFund={calculatedFund} annoRiferimento={fundData.annualData.annoRiferimento} />
-      <ComplianceStatusWidget complianceChecks={complianceChecks} />
+      <div className="mt-8 flex justify-center">
+        <Button onClick={handleRecalculate} isLoading={isLoading} disabled={isLoading} variant="primary" size="lg">
+          {isLoading ? TEXTS_UI.calculating : "Aggiorna Calcoli e Conformità"}
+        </Button>
+      </div>
       
     </div>
   );

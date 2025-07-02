@@ -32,8 +32,8 @@ export const calculateSimulazione = (
     if (!currentInputs) return undefined;
 
     const stipendiTabellari2023 = currentInputs.simStipendiTabellari2023 || 0;
-    const fondoStabileUltimo = currentInputs.simFondoStabileUltimoApprovato || 0;
-    const risorsePOEQUlltimo = currentInputs.simRisorsePOEQUltimoApprovato || 0;
+    const fondoStabileAnnoApplicazione = currentInputs.simFondoStabileAnnoApplicazione || 0;
+    const risorsePOEQAnnoApplicazione = currentInputs.simRisorsePOEQAnnoApplicazione || 0;
     const spesaPersonaleConsuntivo2023 = currentInputs.simSpesaPersonaleConsuntivo2023 || 0;
     const mediaEntrateCorrenti = currentInputs.simMediaEntrateCorrenti2021_2023 || 0;
     const tettoSpesaL296_06 = currentInputs.simTettoSpesaPersonaleL296_06 || 0;
@@ -42,7 +42,7 @@ export const calculateSimulazione = (
 
     // Fase 1: Incremento Potenziale Massimo (Regola del 48%)
     const fase1_obiettivo48 = stipendiTabellari2023 * 0.48;
-    const fase1_fondoAttualeComplessivo = fondoStabileUltimo + risorsePOEQUlltimo;
+    const fase1_fondoAttualeComplessivo = fondoStabileAnnoApplicazione + risorsePOEQAnnoApplicazione;
     const fase1_incrementoPotenzialeLordo = Math.max(0, fase1_obiettivo48 - fase1_fondoAttualeComplessivo);
 
     // Fase 2: Verifica Limite di Spesa del Personale (DM 17/3/2020)

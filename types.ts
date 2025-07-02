@@ -71,13 +71,13 @@ export interface ProventoSpecifico {
 
 export interface SimulatoreIncrementoInput {
   simStipendiTabellari2023?: number;
-  simFondoStabileUltimoApprovato?: number;
-  simRisorsePOEQUltimoApprovato?: number;
+  simFondoStabileAnnoApplicazione?: number;
+  simRisorsePOEQAnnoApplicazione?: number;
   simSpesaPersonaleConsuntivo2023?: number;
   simMediaEntrateCorrenti2021_2023?: number;
   simTettoSpesaPersonaleL296_06?: number;
   simCostoAnnuoNuoveAssunzioniPIAO?: number;
-  simPercentualeOneriIncremento?: number; // Es. 33 per 33%
+  simPercentualeOneriIncremento?: number; // Es. 27.4 per 27.4%
 }
 
 export interface SimulatoreIncrementoRisultati {
@@ -214,6 +214,40 @@ export interface FondoDirigenzaData {
   lim_art4_DL16_2014_misureMancatoRispettoVincoli?: number; // Da sottrarre
 }
 
+export enum LivelloPeo {
+  A1 = "A1", A2 = "A2", A3 = "A3", A4 = "A4", A5 = "A5", A6 = "A6",
+  B1 = "B1", B2 = "B2", B3 = "B3", B4 = "B4", B5 = "B5", B6 = "B6", B7 = "B7", B8 = "B8",
+  C1 = "C1", C2 = "C2", C3 = "C3", C4 = "C4", C5 = "C5", C6 = "C6",
+  D1 = "D1", D2 = "D2", D3 = "D3", D4 = "D4", D5 = "D5", D6 = "D6", D7 = "D7",
+}
+
+export enum AreaQualifica {
+  OPERATORE = "OPERATORE",
+  OPERATORE_ESPERTO = "OPERATORE_ESPERTO",
+  ISTRUTTORE = "ISTRUTTORE",
+  FUNZIONARIO_EQ = "FUNZIONARIO_EQ"
+}
+
+export enum TipoMaggiorazione {
+  NESSUNA = "NESSUNA",
+  EDUCATORE = "EDUCATORE", // Aggiornato
+  POLIZIA_LOCALE = "POLIZIA_LOCALE", // Aggiornato
+  ISCRITTO_ALBI_ORDINI = "ISCRITTO_ALBI_ORDINI", // Aggiornato
+}
+
+export interface PersonaleServizioDettaglio { // Rinominato da EmployeeDetail2025
+  id: string;
+  matricola?: string;
+  partTimePercentage?: number; // 1-100, default 100
+  fullYearService: boolean;    // default true
+  assunzioneDate?: string;     // YYYY-MM-DD
+  cessazioneDate?: string;     // YYYY-MM-DD
+  livelloPeoStoriche?: LivelloPeo;
+  numeroDifferenziali?: number; // 0-6
+  tipoMaggiorazione?: TipoMaggiorazione;
+  areaQualifica?: AreaQualifica; // NUOVO CAMPO
+}
+
 
 export interface AnnualData {
   annoRiferimento: number;
@@ -235,6 +269,7 @@ export interface AnnualData {
   condizioniVirtuositaFinanziariaSoddisfatte?: boolean; // Rimosso da UI, ma tenuto in types
   personale2018PerArt23: Art23EmployeeDetail[];
   personaleAnnoRifPerArt23: Art23EmployeeDetail[];
+  personaleServizioDettagli?: PersonaleServizioDettaglio[]; // Rinominato da personale2025
   simulatoreInput?: SimulatoreIncrementoInput;
   simulatoreRisultati?: SimulatoreIncrementoRisultati; 
   fondoStabile2016PNRR?: number;
@@ -318,6 +353,9 @@ export type AppAction =
   | { type: 'ADD_ART23_EMPLOYEE_DETAIL'; payload: { yearType: '2018' | 'annoRif'; detail: Art23EmployeeDetail } }
   | { type: 'UPDATE_ART23_EMPLOYEE_DETAIL'; payload: { yearType: '2018' | 'annoRif'; index: number; detail: Art23EmployeeDetail } }
   | { type: 'REMOVE_ART23_EMPLOYEE_DETAIL'; payload: { yearType: '2018' | 'annoRif'; index: number } }
+  | { type: 'ADD_PERSONALE_SERVIZIO_DETTAGLIO'; payload: PersonaleServizioDettaglio } // Rinominata action
+  | { type: 'UPDATE_PERSONALE_SERVIZIO_DETTAGLIO'; payload: { index: number; detail: PersonaleServizioDettaglio } } // Rinominata action
+  | { type: 'REMOVE_PERSONALE_SERVIZIO_DETTAGLIO'; payload: { index: number } } // Rinominata action
   | { type: 'UPDATE_SIMULATORE_INPUT'; payload: Partial<SimulatoreIncrementoInput> }
   | { type: 'UPDATE_SIMULATORE_RISULTATI'; payload: SimulatoreIncrementoRisultati | undefined } 
   | { type: 'UPDATE_FONDO_ACCESSORIO_DIPENDENTE_DATA'; payload: Partial<FondoAccessorioDipendenteData> }

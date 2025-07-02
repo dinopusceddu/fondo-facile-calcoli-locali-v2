@@ -1,5 +1,5 @@
 // constants.ts
-import { EmployeeCategory, UserRole, TipologiaEnte, SimulatoreIncrementoInput, FondoAccessorioDipendenteData, FondoElevateQualificazioniData, FondoSegretarioComunaleData, FondoDirigenzaData } from './types.js';
+import { EmployeeCategory, UserRole, TipologiaEnte, SimulatoreIncrementoInput, FondoAccessorioDipendenteData, FondoElevateQualificazioniData, FondoSegretarioComunaleData, FondoDirigenzaData, LivelloPeo, TipoMaggiorazione, AreaQualifica } from './types.js';
 
 export const APP_NAME = "Salario accessorio Funzioni Locali";
 
@@ -33,7 +33,6 @@ export const RIF_ART23_C5_CCNL2022 = "Art. 23 c.5 CCNL Funzioni Locali 16.11.202
 export const RIF_DELIBERA_ENTE = "Delibera Ente / Disposizione Interna";
 
 
-// Riferimenti per Fondo Segretario Comunale
 export const RIF_CCNL_SEG_01032011_ART3C6 = "Art. 3 c. 6 CCNL Segretari 01.03.2011";
 export const RIF_CCNL_SEG_16072024_ART58C1 = "Art. 58 c. 1 CCNL Segretari 16.07.2024";
 export const RIF_CCNL_SEG_16072024_ART60C1 = "Art. 60 c. 1 CCNL Segretari 16.07.2024";
@@ -79,13 +78,13 @@ export const ALL_TIPOLOGIE_ENTE: { value: TipologiaEnte; label: string }[] = Obj
 
 export const INITIAL_SIMULATORE_INPUT: SimulatoreIncrementoInput = {
   simStipendiTabellari2023: undefined,
-  simFondoStabileUltimoApprovato: undefined,
-  simRisorsePOEQUltimoApprovato: undefined,
+  simFondoStabileAnnoApplicazione: undefined,
+  simRisorsePOEQAnnoApplicazione: undefined,
   simSpesaPersonaleConsuntivo2023: undefined,
   simMediaEntrateCorrenti2021_2023: undefined,
   simTettoSpesaPersonaleL296_06: undefined,
   simCostoAnnuoNuoveAssunzioniPIAO: undefined,
-  simPercentualeOneriIncremento: undefined, 
+  simPercentualeOneriIncremento: 27.4, 
 };
 
 export const INITIAL_FONDO_ACCESSORIO_DIPENDENTE_DATA: FondoAccessorioDipendenteData = {
@@ -106,7 +105,7 @@ export const INITIAL_FONDO_ACCESSORIO_DIPENDENTE_DATA: FondoAccessorioDipendente
   st_art79c1d_differenzialiStipendiali2022: undefined,
   st_art79c1bis_diffStipendialiB3D3: undefined,
   st_incrementoDecretoPA: undefined,
-  st_riduzionePerIncrementoEQ: undefined, // NUOVO CAMPO
+  st_riduzionePerIncrementoEQ: undefined, 
   vs_art4c3_art15c1k_art67c3c_recuperoEvasione: undefined,
   vs_art4c2_art67c3d_integrazioneRIAMensile: undefined,
   vs_art67c3g_personaleCaseGioco: undefined,
@@ -138,7 +137,7 @@ export const INITIAL_FONDO_ELEVATE_QUALIFICAZIONI_DATA: FondoElevateQualificazio
   ris_fondoPO2017: undefined,
   ris_incrementoConRiduzioneFondoDipendenti: undefined,
   ris_incrementoLimiteArt23c2_DL34: undefined,
-  ris_incremento022MonteSalari2018: undefined, // Spostato e rinominato
+  ris_incremento022MonteSalari2018: undefined, 
   fin_art23c2_adeguamentoTetto2016: undefined,
   
   st_art17c2_retribuzionePosizione: undefined,
@@ -209,6 +208,7 @@ export const INITIAL_ANNUAL_DATA = {
   condizioniVirtuositaFinanziariaSoddisfatte: undefined,
   personale2018PerArt23: [],
   personaleAnnoRifPerArt23: [],
+  personaleServizioDettagli: [], // Rinominato e inizializzato
   simulatoreInput: INITIAL_SIMULATORE_INPUT,
   simulatoreRisultati: undefined, 
   fondoStabile2016PNRR: undefined,
@@ -240,4 +240,74 @@ export const TEXTS_UI = {
   notApplicable: "N/D",
   add: "Aggiungi",
   remove: "Rimuovi",
+};
+
+// Costanti per i select
+export const ALL_LIVELLI_PEO: { value: LivelloPeo; label: string }[] = 
+  Object.values(LivelloPeo).map(livello => ({ value: livello, label: livello }));
+
+export const ALL_NUMERO_DIFFERENZIALI: { value: number; label: string }[] = 
+  Array.from({ length: 7 }, (_, i) => ({ value: i, label: i.toString() }));
+
+export const ALL_AREE_QUALIFICA: { value: AreaQualifica; label: string }[] = [
+  { value: AreaQualifica.OPERATORE, label: "Operatore" },
+  { value: AreaQualifica.OPERATORE_ESPERTO, label: "Operatore Esperto" },
+  { value: AreaQualifica.ISTRUTTORE, label: "Istruttore" },
+  { value: AreaQualifica.FUNZIONARIO_EQ, label: "Funzionario ed Elevata Qualificazione" },
+];
+
+export const ALL_TIPI_MAGGIORAZIONE: { value: TipoMaggiorazione; label: string }[] = [
+  { value: TipoMaggiorazione.NESSUNA, label: "Nessuna Maggiorazione" },
+  { value: TipoMaggiorazione.EDUCATORE, label: "Educatore" },
+  { value: TipoMaggiorazione.POLIZIA_LOCALE, label: "Polizia Locale" },
+  { value: TipoMaggiorazione.ISCRITTO_ALBI_ORDINI, label: "Iscritto ad albi ed ordini" },
+];
+
+export const PROGRESSION_ECONOMIC_VALUES: {
+  [key in AreaQualifica]?: { [key in LivelloPeo]?: number }
+} = {
+  [AreaQualifica.FUNZIONARIO_EQ]: {
+    [LivelloPeo.D7]: 9942.67,
+    [LivelloPeo.D6]: 8268.51,
+    [LivelloPeo.D5]: 6096.04,
+    [LivelloPeo.D4]: 4808.21,
+    [LivelloPeo.D3]: 3636.30,
+    [LivelloPeo.D2]: 1186.92,
+    [LivelloPeo.D1]: 0.00,
+  },
+  [AreaQualifica.ISTRUTTORE]: {
+    [LivelloPeo.C6]: 3833.81,
+    [LivelloPeo.C5]: 2882.89,
+    [LivelloPeo.C4]: 1962.61,
+    [LivelloPeo.C3]: 1201.36,
+    [LivelloPeo.C2]: 546.42,
+    [LivelloPeo.C1]: 0.00,
+  },
+  [AreaQualifica.OPERATORE_ESPERTO]: {
+    [LivelloPeo.B8]: 3891.41,
+    [LivelloPeo.B7]: 3101.99,
+    [LivelloPeo.B6]: 2236.23,
+    [LivelloPeo.B5]: 1842.18,
+    [LivelloPeo.B4]: 1475.56,
+    [LivelloPeo.B3]: 1159.74,
+    [LivelloPeo.B2]: 337.85,
+    [LivelloPeo.B1]: 0.00,
+  },
+  [AreaQualifica.OPERATORE]: {
+    [LivelloPeo.A6]: 1768.60,
+    [LivelloPeo.A5]: 1408.93,
+    [LivelloPeo.A4]: 1001.22,
+    [LivelloPeo.A3]: 659.65,
+    [LivelloPeo.A2]: 258.85,
+    [LivelloPeo.A1]: 0.00,
+  },
+};
+
+export const INDENNITA_COMPARTO_VALUES: {
+  [key in AreaQualifica]?: number
+} = {
+  [AreaQualifica.OPERATORE]: 563.40,
+  [AreaQualifica.OPERATORE_ESPERTO]: 497.52,
+  [AreaQualifica.ISTRUTTORE]: 426.96,
+  [AreaQualifica.FUNZIONARIO_EQ]: 351.72,
 };

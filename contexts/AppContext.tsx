@@ -1,6 +1,6 @@
 // contexts/AppContext.tsx
 import React, { createContext, useReducer, Dispatch, useContext, useCallback } from 'react';
-import { AppState, AppAction, UserRole, FundData, CalculatedFund, ComplianceCheck, ProventoSpecifico, EmployeeCategory, Art23EmployeeDetail, SimulatoreIncrementoInput, FondoAccessorioDipendenteData, FondoElevateQualificazioniData, FondoSegretarioComunaleData, FondoDirigenzaData, SimulatoreIncrementoRisultati } from '../types.js';
+import { AppState, AppAction, UserRole, FundData, CalculatedFund, ComplianceCheck, ProventoSpecifico, EmployeeCategory, Art23EmployeeDetail, SimulatoreIncrementoInput, FondoAccessorioDipendenteData, FondoElevateQualificazioniData, FondoSegretarioComunaleData, FondoDirigenzaData, SimulatoreIncrementoRisultati, PersonaleServizioDettaglio } from '../types.js';
 import { DEFAULT_CURRENT_YEAR, INITIAL_HISTORICAL_DATA, INITIAL_ANNUAL_DATA, DEFAULT_USER, INITIAL_FONDO_ACCESSORIO_DIPENDENTE_DATA, INITIAL_FONDO_ELEVATE_QUALIFICAZIONI_DATA, INITIAL_FONDO_SEGRETARIO_COMUNALE_DATA, INITIAL_FONDO_DIRIGENZA_DATA } from '../constants.js';
 import { calculateFundCompletely } from '../hooks/useFundCalculations.js'; 
 import { runAllComplianceChecks } from '../hooks/useComplianceChecks.js'; 
@@ -10,7 +10,10 @@ const initialState: AppState = {
   currentYear: DEFAULT_CURRENT_YEAR,
   fundData: {
     historicalData: INITIAL_HISTORICAL_DATA,
-    annualData: INITIAL_ANNUAL_DATA, 
+    annualData: {
+        ...INITIAL_ANNUAL_DATA,
+        personaleServizioDettagli: [], // Assicura che sia inizializzato
+    }, 
     fondoAccessorioDipendenteData: INITIAL_FONDO_ACCESSORIO_DIPENDENTE_DATA,
     fondoElevateQualificazioniData: INITIAL_FONDO_ELEVATE_QUALIFICAZIONI_DATA,
     fondoSegretarioComunaleData: INITIAL_FONDO_SEGRETARIO_COMUNALE_DATA,
@@ -20,7 +23,7 @@ const initialState: AppState = {
   complianceChecks: [],
   isLoading: false,
   error: undefined,
-  activeTab: 'benvenuto', // Updated initial tab
+  activeTab: 'benvenuto', 
 };
 
 const AppContext = createContext<{
@@ -68,7 +71,7 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
           }
         }
       };
-    case 'UPDATE_CALCOLATO_INCREMENTO_PNRR3': // Nuovo gestore azione
+    case 'UPDATE_CALCOLATO_INCREMENTO_PNRR3': 
       return {
         ...state,
         fundData: {
@@ -193,6 +196,49 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
                     [key]: filteredList 
                 }
             }
+        };
+      }
+    case 'ADD_PERSONALE_SERVIZIO_DETTAGLIO': // Rinominata action
+      return {
+        ...state,
+        fundData: {
+          ...state.fundData,
+          annualData: {
+            ...state.fundData.annualData,
+            personaleServizioDettagli: [...(state.fundData.annualData.personaleServizioDettagli || []), action.payload],
+          },
+        },
+      };
+    case 'UPDATE_PERSONALE_SERVIZIO_DETTAGLIO': // Rinominata action
+      {
+        const currentList = [...(state.fundData.annualData.personaleServizioDettagli || [])];
+        if (action.payload.index >= 0 && action.payload.index < currentList.length) {
+          currentList[action.payload.index] = action.payload.detail;
+        }
+        return {
+          ...state,
+          fundData: {
+            ...state.fundData,
+            annualData: {
+              ...state.fundData.annualData,
+              personaleServizioDettagli: currentList,
+            },
+          },
+        };
+      }
+    case 'REMOVE_PERSONALE_SERVIZIO_DETTAGLIO': // Rinominata action
+      {
+        const currentList = state.fundData.annualData.personaleServizioDettagli || [];
+        const filteredList = currentList.filter((_, i) => i !== action.payload.index);
+        return {
+          ...state,
+          fundData: {
+            ...state.fundData,
+            annualData: {
+              ...state.fundData.annualData,
+              personaleServizioDettagli: filteredList,
+            },
+          },
         };
       }
     case 'CALCULATE_FUND_START':

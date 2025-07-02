@@ -50,22 +50,44 @@ export const SimulatoreIncrementoForm: React.FC = () => {
         La tabella delle soglie DM 17/03/2020 applicata è quella per: <strong className="text-[#1b0e0e]">{tabellaSoglieUsata}</strong>.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-0">
-        <Input label="Stipendi tabellari personale 31/12/2023 (€)" type="number" name="simStipendiTabellari2023" value={si.simStipendiTabellari2023 ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 1500000.00" containerClassName="mb-3"/>
-        <Input label="Ammontare componente stabile Fondo (ultimo approvato, €)" type="number" name="simFondoStabileUltimoApprovato" value={si.simFondoStabileUltimoApprovato ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 200000.00" containerClassName="mb-3"/>
-        <Input label="Ammontare risorse PO/EQ (ultimo approvato, €)" type="number" name="simRisorsePOEQUltimoApprovato" value={si.simRisorsePOEQUltimoApprovato ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 50000.00" containerClassName="mb-3"/>
-        <Input label="Spesa di personale (Consuntivo 2023, €)" type="number" name="simSpesaPersonaleConsuntivo2023" value={si.simSpesaPersonaleConsuntivo2023 ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 2000000.00" containerClassName="mb-3"/>
-        <Input label="Media Entrate Correnti 2021-23 (netto FCDE 2023, €)" type="number" name="simMediaEntrateCorrenti2021_2023" value={si.simMediaEntrateCorrenti2021_2023 ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 8000000.00" containerClassName="mb-3"/>
-        <Input label="Tetto spesa personale L. 296/06 (media 2011-13, €)" type="number" name="simTettoSpesaPersonaleL296_06" value={si.simTettoSpesaPersonaleL296_06 ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 1800000.00" containerClassName="mb-3"/>
-        <Input label="Costo annuo nuove assunzioni PIAO (a regime, €)" type="number" name="simCostoAnnuoNuoveAssunzioniPIAO" value={si.simCostoAnnuoNuoveAssunzioniPIAO ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 70000.00" containerClassName="mb-3"/>
-        <Input label="Percentuale Oneri su incremento (IRAP e Contributi, %)" type="number" name="simPercentualeOneriIncremento" value={si.simPercentualeOneriIncremento ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 33.00 (per 33%)" containerClassName="mb-3"/>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        <div>
+            <Input label="Stipendi tabellari personale 2023" type="number" name="simStipendiTabellari2023" value={si.simStipendiTabellari2023 ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 1500000.00" containerClassName="mb-1"/>
+            <p className="text-xs text-[#5f5252] px-1">Come da Circ. RGS 175706/2025: valore complessivo lordo dipendente, inclusa 13a mensilità. Escludere l'Indennità di Vacanza Contrattuale (IVC).</p>
+        </div>
+        <div>
+            <Input label="Ammontare componente stabile del Fondo per l'anno di applicazione:" type="number" name="simFondoStabileAnnoApplicazione" value={si.simFondoStabileAnnoApplicazione ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 200000.00" containerClassName="mb-1"/>
+            <p className="text-xs text-[#5f5252] px-1">Valore prima del potenziale incremento (Circ. RGS par. 2.3, lett. a).</p>
+        </div>
+        <div>
+            <Input label="Ammontare remunerazione incarichi di Elevata Qualificazione (EQ) per l'anno di applicazione:" type="number" name="simRisorsePOEQAnnoApplicazione" value={si.simRisorsePOEQAnnoApplicazione ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 50000.00" containerClassName="mb-1"/>
+            <p className="text-xs text-[#5f5252] px-1">Valore relativo all'anno di applicazione (Circ. RGS par. 2.3, lett. b).</p>
+        </div>
+        <div>
+            <Input label="Spesa di personale (ultimo consuntivo approvato, €)" type="number" name="simSpesaPersonaleConsuntivo2023" value={si.simSpesaPersonaleConsuntivo2023 ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 2000000.00" containerClassName="mb-1"/>
+            <p className="text-xs text-[#5f5252] px-1">Spesa risultante dal macroaggregato BDAP U.1.01.00.00.000, nonché nei codici spesa: U1.03.02.12.001; U1.03.02.12.002; U1.03.02.12.003; U1.03.02.12.999</p>
+        </div>
+        <div>
+            <Input label="Media Entrate Correnti 2021-23 (netto FCDE 2023, €)" type="number" name="simMediaEntrateCorrenti2021_2023" value={si.simMediaEntrateCorrenti2021_2023 ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 8000000.00" containerClassName="mb-3"/>
+        </div>
+        <div>
+            <Input label="Tetto di spesa personale art. 1 c. 557 o c. 562 L. 296/06 (media 2011-13 o 2008):" type="number" name="simTettoSpesaPersonaleL296_06" value={si.simTettoSpesaPersonaleL296_06 ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 1800000.00" containerClassName="mb-1"/>
+            <p className="text-xs text-[#5f5252] px-1">Spesa di personale complessiva, al netto delle voci sterilizzate per il calcolo</p>
+        </div>
+        <div>
+            <Input label="Costo annuo nuove assunzioni PIAO (a regime, €)" type="number" name="simCostoAnnuoNuoveAssunzioniPIAO" value={si.simCostoAnnuoNuoveAssunzioniPIAO ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 70000.00" containerClassName="mb-3"/>
+        </div>
+        <div>
+            <Input label="Percentuale oneri riflessi al netto dell'IRAP e maggiorato con i contributi INAIL sull'incremento del fondo:" type="number" name="simPercentualeOneriIncremento" value={si.simPercentualeOneriIncremento ?? ''} onChange={handleChange} step="0.01" placeholder="Es. 27.40" containerClassName="mb-1"/>
+            <p className="text-xs text-[#5f5252] px-1">La Circ. RGS indica convenzionalmente il 27,4% + INAIL.</p>
+        </div>
       </div>
 
       {risultati && (
         <div className="mt-6 space-y-4">
           <PhaseCard title={`Fase 1: Incremento Potenziale Massimo (Target 48% - ${RIF_ART14_DL25_2025})`} highlightValue={formatCurrencyForDisplay(risultati.fase1_incrementoPotenzialeLordo) + " (Limite 1)"}>
             <p>Obiettivo 48% degli stipendi tabellari 2023: {formatCurrencyForDisplay(risultati.fase1_obiettivo48)}</p>
-            <p>Fondo Attuale Complessivo (Stabile + PO/EQ): {formatCurrencyForDisplay(risultati.fase1_fondoAttualeComplessivo)}</p>
+            <p>Fondo Anno di Applicazione (Stabile + EQ): {formatCurrencyForDisplay(risultati.fase1_fondoAttualeComplessivo)}</p>
             <p>Incremento Potenziale Lordo (Obiettivo - Attuale): {formatCurrencyForDisplay(risultati.fase1_incrementoPotenzialeLordo)}</p>
           </PhaseCard>
 

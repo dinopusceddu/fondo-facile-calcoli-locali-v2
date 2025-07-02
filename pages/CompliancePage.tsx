@@ -40,7 +40,7 @@ export const CompliancePage: React.FC = () => {
 
   if (!complianceChecks || complianceChecks.length === 0) {
     return (
-      <Card title="Controlli di Conformità Normativa">
+      <Card title="Controllo dei limiti">
         <p className="text-[#1b0e0e]">{TEXTS_UI.noDataAvailable} Nessun controllo di conformità eseguito o dati non disponibili. Effettuare il calcolo del fondo.</p>
       </Card>
     );
@@ -53,7 +53,7 @@ export const CompliancePage: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-[#1b0e0e] tracking-light text-2xl sm:text-[30px] font-bold leading-tight">Controlli di Conformità Normativa</h2>
+      <h2 className="text-[#1b0e0e] tracking-light text-2xl sm:text-[30px] font-bold leading-tight">Controllo dei limiti</h2>
       
       {(criticalIssues.length > 0 || warnings.length > 0) && (
         <Card title="Criticità e Avvisi Importanti" className="border-l-4 border-[#ea2832]">
