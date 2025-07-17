@@ -203,7 +203,8 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       console.log('Reducer: Action received:', action);
       console.log('Reducer: State BEFORE:', state.fundData.annualData.personaleServizioDettagli);
       const newList = [...(state.fundData.annualData.personaleServizioDettagli || []), action.payload];
-      const newState = {
+      console.log('Reducer: State AFTER:', newList);
+      return {
         ...state,
         fundData: {
           ...state.fundData,
@@ -213,8 +214,6 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
           },
         },
       };
-      console.log('Reducer: State AFTER:', newState.fundData.annualData.personaleServizioDettagli);
-      return newState;
     }
     case 'UPDATE_PERSONALE_SERVIZIO_DETTAGLIO': {
       console.log('Reducer: Action received:', action);
@@ -223,7 +222,8 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       const updatedList = currentList.map(emp => 
         emp.id === action.payload.detail.id ? action.payload.detail : emp
       );
-      const newState = {
+      console.log('Reducer: State AFTER:', updatedList);
+      return {
         ...state,
         fundData: {
           ...state.fundData,
@@ -233,15 +233,14 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
           },
         },
       };
-      console.log('Reducer: State AFTER:', newState.fundData.annualData.personaleServizioDettagli);
-      return newState;
     }
     case 'REMOVE_PERSONALE_SERVIZIO_DETTAGLIO': {
       console.log('Reducer: Action received:', action);
       console.log('Reducer: State BEFORE:', state.fundData.annualData.personaleServizioDettagli);
       const currentList = state.fundData.annualData.personaleServizioDettagli || [];
       const filteredList = currentList.filter(emp => emp.id !== action.payload.id);
-      const newState = {
+      console.log('Reducer: State AFTER:', filteredList);
+      return {
         ...state,
         fundData: {
           ...state.fundData,
@@ -251,8 +250,6 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
           },
         },
       };
-      console.log('Reducer: State AFTER:', newState.fundData.annualData.personaleServizioDettagli);
-      return newState;
     }
     case 'SET_PERSONALE_SERVIZIO_DETTAGLI':
       return {

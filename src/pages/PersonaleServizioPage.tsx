@@ -89,17 +89,13 @@ export const PersonaleServizioPage: React.FC = () => {
     alert("Sincronizzazione completata con successo!");
   };
   
-  const handleUpdateEmployee = (id: string, field: keyof PersonaleServizioDettaglio, value: any) => {
-    const employeeToUpdate = employeeList.find(e => e.id === id);
-    if (!employeeToUpdate) return;
-    
-    const updatedEmployee = { ...employeeToUpdate };
+  const handleUpdateEmployee = (index: number, field: keyof PersonaleServizioDettaglio, value: any) => {
+    const updatedEmployees = [...employeeList];
+    const updatedEmployee = { ...updatedEmployees[index] };
 
-    // Create the updated employee object based on the changed field
     switch (field) {
       case 'areaQualifica':
           updatedEmployee[field] = (value === '' || value === null || value === undefined) ? undefined : value as AreaQualifica;
-          // Reset dependent fields when area changes
           updatedEmployee.livelloPeoStoriche = undefined; 
           updatedEmployee.numeroDifferenziali = 0;
           updatedEmployee.tipoMaggiorazione = TipoMaggiorazione.NESSUNA;
@@ -129,12 +125,12 @@ export const PersonaleServizioPage: React.FC = () => {
           updatedEmployee[field] = (value === '' || value === null || value === undefined) ? undefined : String(value);
           break;
       default:
+          // 'id' non è modificabile
           break;
     }
 
-    const payload = { detail: updatedEmployee };
-    console.log('Dispatching UPDATE_PERSONALE_SERVIZIO_DETTAGLIO with payload:', payload);
-    dispatch({ type: 'UPDATE_PERSONALE_SERVIZIO_DETTAGLIO', payload });
+    updatedEmployees[index] = updatedEmployee;
+    dispatch({ type: 'SET_PERSONALE_SERVIZIO_DETTAGLI', payload: updatedEmployees });
   };
   
   const handleAddEmployee = () => {
@@ -146,14 +142,14 @@ export const PersonaleServizioPage: React.FC = () => {
       tipoMaggiorazione: TipoMaggiorazione.NESSUNA, 
       livelloPeoStoriche: undefined, 
     };
-    console.log('Dispatching ADD_PERSONALE_SERVIZIO_DETTAGLIO with payload:', newEmployee);
-    dispatch({ type: 'ADD_PERSONALE_SERVIZIO_DETTAGLIO', payload: newEmployee });
+    dispatch({ type: 'SET_PERSONALE_SERVIZIO_DETTAGLI', payload: [...employeeList, newEmployee] });
   };
 
   const handleRemoveEmployee = (idToRemove: string) => {
-    // Rimosso window.confirm per evitare problemi di sandbox e per rendere l'azione più diretta.
-    console.log('Dispatching REMOVE_PERSONALE_SERVIZIO_DETTAGLIO with id:', idToRemove);
-    dispatch({ type: 'REMOVE_PERSONALE_SERVIZIO_DETTAGLIO', payload: { id: idToRemove } });
+    if (window.confirm("Sei sicuro di voler rimuovere questo dipendente?")) {
+      const updatedEmployees = employeeList.filter(employee => employee.id !== idToRemove);
+      dispatch({ type: 'SET_PERSONALE_SERVIZIO_DETTAGLI', payload: updatedEmployees });
+    }
   };
 
   const calculateServiceRatio = (employee: PersonaleServizioDettaglio): number => {
@@ -273,7 +269,7 @@ export const PersonaleServizioPage: React.FC = () => {
                   label="Matricola (Opzionale)"
                   id={`matricola_${employee.id}`}
                   value={employee.matricola ?? ''}
-                  onChange={(e) => handleUpdateEmployee(employee.id, 'matricola', e.target.value)}
+                  onChange={(e) => handleUpdateEmployee(index, 'matricola', e.target.value)}
                   containerClassName="mb-3"
                 />
                 <Select
@@ -281,7 +277,7 @@ export const PersonaleServizioPage: React.FC = () => {
                   id={`area_qualifica_${employee.id}`}
                   options={ALL_AREE_QUALIFICA}
                   value={employee.areaQualifica ?? ''}
-                  onChange={(e) => handleUpdateEmployee(employee.id, 'areaQualifica', e.target.value as AreaQualifica)}
+                  onChange={(e) => handleUpdateEmployee(index, 'areaQualifica', e.target.value as AreaQualifica)}
                   placeholder="Seleziona area..."
                   containerClassName="mb-3"
                 />
@@ -290,7 +286,7 @@ export const PersonaleServizioPage: React.FC = () => {
                   type="number"
                   id={`pt_${employee.id}`}
                   value={employee.partTimePercentage ?? ''}
-                  onChange={(e) => handleUpdateEmployee(employee.id, 'partTimePercentage', e.target.value)}
+                  onChange={(e) => handleUpdateEmployee(index, 'partTimePercentage', e.target.value)}
                   min="1" max="100" step="0.01" placeholder="100"
                   containerClassName="mb-3"
                 />
@@ -299,7 +295,7 @@ export const PersonaleServizioPage: React.FC = () => {
                     type="checkbox"
                     id={`fullYear_${employee.id}`}
                     checked={employee.fullYearService}
-                    onChange={(e) => handleUpdateEmployee(employee.id, 'fullYearService', e.target.checked)}
+                    onChange={(e) => handleUpdateEmployee(index, 'fullYearService', e.target.checked)}
                     className="h-5 w-5 text-[#ea2832] border-[#d1c0c1] rounded focus:ring-[#ea2832]/50"
                   />
                   <label htmlFor={`fullYear_${employee.id}`} className="ml-2 text-sm text-[#1b0e0e]">
@@ -314,7 +310,7 @@ export const PersonaleServizioPage: React.FC = () => {
                       type="date"
                       id={`assunzione_${employee.id}`}
                       value={employee.assunzioneDate ?? ''}
-                      onChange={(e) => handleUpdateEmployee(employee.id, 'assunzioneDate', e.target.value)}
+                      onChange={(e) => handleUpdateEmployee(index, 'assunzioneDate', e.target.value)}
                       containerClassName="mb-3"
                     />
                     <Input
@@ -322,7 +318,7 @@ export const PersonaleServizioPage: React.FC = () => {
                       type="date"
                       id={`cessazione_${employee.id}`}
                       value={employee.cessazioneDate ?? ''}
-                      onChange={(e) => handleUpdateEmployee(employee.id, 'cessazioneDate', e.target.value)}
+                      onChange={(e) => handleUpdateEmployee(index, 'cessazioneDate', e.target.value)}
                       containerClassName="mb-3"
                     />
                   </>
@@ -333,7 +329,7 @@ export const PersonaleServizioPage: React.FC = () => {
                   id={`livelloPeo_${employee.id}`}
                   options={peoOptions}
                   value={employee.livelloPeoStoriche ?? NESSUNA_PEO_VALUE}
-                  onChange={(e) => handleUpdateEmployee(employee.id, 'livelloPeoStoriche', e.target.value)}
+                  onChange={(e) => handleUpdateEmployee(index, 'livelloPeoStoriche', e.target.value)}
                   placeholder="Seleziona livello..."
                   containerClassName="mb-3 col-span-full sm:col-span-1"
                   disabled={!employee.areaQualifica}
@@ -343,7 +339,7 @@ export const PersonaleServizioPage: React.FC = () => {
                   id={`numDiff_${employee.id}`}
                   options={differenzialiOptions}
                   value={employee.numeroDifferenziali ?? '0'}
-                  onChange={(e) => handleUpdateEmployee(employee.id, 'numeroDifferenziali', e.target.value)}
+                  onChange={(e) => handleUpdateEmployee(index, 'numeroDifferenziali', e.target.value)}
                   placeholder="Seleziona n° diff..."
                   containerClassName="mb-3 col-span-full sm:col-span-1"
                   disabled={!employee.areaQualifica}
@@ -353,7 +349,7 @@ export const PersonaleServizioPage: React.FC = () => {
                   id={`maggiorazione_${employee.id}`}
                   options={maggiorazioniOptions}
                   value={employee.tipoMaggiorazione ?? TipoMaggiorazione.NESSUNA}
-                  onChange={(e) => handleUpdateEmployee(employee.id, 'tipoMaggiorazione', e.target.value as TipoMaggiorazione)}
+                  onChange={(e) => handleUpdateEmployee(index, 'tipoMaggiorazione', e.target.value as TipoMaggiorazione)}
                   placeholder="Seleziona maggiorazione..."
                   containerClassName="mb-3 col-span-full sm:col-span-1"
                   disabled={!employee.areaQualifica || isMaggiorazioneDisabled}

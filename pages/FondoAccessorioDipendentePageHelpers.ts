@@ -166,6 +166,13 @@ export const calculateFadTotals = (
         sommaVariabiliNonSoggette_Dipendenti -
         altreRisorseDecurtazioniFinali_Dipendenti -
         decurtazioniLimiteSalarioAccessorio_Dipendenti;
+    
+    const sommaStabiliSoggetteLimite = fadFieldDefinitions
+        .filter(def => def.section === 'stabili' && def.isRelevantToArt23Limit)
+        .reduce((sum, def) => {
+            const value = getValue(def.key);
+            return sum + (def.isSubtractor ? -value : value);
+        },0);
         
     return {
         sommaStabili_Dipendenti,
@@ -173,6 +180,7 @@ export const calculateFadTotals = (
         sommaVariabiliNonSoggette_Dipendenti,
         altreRisorseDecurtazioniFinali_Dipendenti,
         decurtazioniLimiteSalarioAccessorio_Dipendenti,
-        totaleRisorseDisponibiliContrattazione_Dipendenti
+        totaleRisorseDisponibiliContrattazione_Dipendenti,
+        sommaStabiliSoggetteLimite
     };
 };
