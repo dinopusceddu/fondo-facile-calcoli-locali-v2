@@ -2,23 +2,23 @@
 import React, { useEffect } from 'react';
 
 // Importazioni aggiornate per puntare alle directory corrette e con estensione corretta
-import { HomePage } from './pages/HomePage';
-import { DataEntryPage } from './pages/DataEntryPage';
-import { FundDetailsPage } from './pages/FundDetailsPage';
-import { CompliancePage } from './pages/CompliancePage';
-import { ReportsPage } from './pages/ReportsPage';
-import { FondoAccessorioDipendentePage } from './pages/FondoAccessorioDipendentePage';
-import { FondoElevateQualificazioniPage } from './pages/FondoElevateQualificazioniPage';
-import { FondoSegretarioComunalePage } from './pages/FondoSegretarioComunalePage';
-import { FondoDirigenzaPage } from './pages/FondoDirigenzaPage';
-import { ChecklistPage } from './pages/ChecklistPage';
-import { PersonaleServizioPage } from './pages/PersonaleServizioPage';
-import { DistribuzioneRisorsePage } from './pages/DistribuzioneRisorsePage';
+import { HomePage } from '@/pages/HomePage';
+import { DataEntryPage } from '@/pages/DataEntryPage';
+import { FundDetailsPage } from '@/pages/FundDetailsPage';
+import { CompliancePage } from '@/pages/CompliancePage';
+import { ReportsPage } from '@/pages/ReportsPage';
+import { FondoAccessorioDipendentePage } from '@/pages/FondoAccessorioDipendentePage';
+import { FondoElevateQualificazioniPage } from '@/pages/FondoElevateQualificazioniPage';
+import { FondoSegretarioComunalePage } from '@/pages/FondoSegretarioComunalePage';
+import { FondoDirigenzaPage } from '@/pages/FondoDirigenzaPage';
+import { ChecklistPage } from '@/pages/ChecklistPage';
+import { PersonaleServizioPage } from '@/pages/PersonaleServizioPage';
+import { DistribuzioneRisorsePage } from '@/pages/DistribuzioneRisorsePage';
 
-import { AppProvider, useAppContext } from './contexts/AppContext';
-import { MainLayout } from './components/layout/MainLayout';
-import { PageModule } from './types';
-import { LoadingSpinner } from './components/shared/LoadingSpinner';
+import { AppProvider, useAppContext } from '@/contexts/AppContext';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { PageModule } from '@/types';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 
 
 const allPageModules: PageModule[] = [
