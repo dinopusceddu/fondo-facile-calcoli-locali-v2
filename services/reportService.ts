@@ -456,6 +456,8 @@ export const generateDeterminazioneTXT = (
     document.body.removeChild(link);
 };
 
+import * as XLSX from 'xlsx';
+
 export const generateFADXLS = (
     fadData: FondoAccessorioDipendenteData,
     annoRiferimento: number,
@@ -463,50 +465,71 @@ export const generateFADXLS = (
     isEnteInCondizioniSpeciali: boolean,
     incrementoEQconRiduzioneDipendenti: number | undefined
 ): void => {
-    const headers = ["Sezione", "Descrizione", "Riferimento Normativo", "Importo (€)", "Rileva per Limite Art. 23?"];
-    
-    const rows: (string|number)[][] = [];
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([]);
 
-    fadFieldDefinitions.forEach(def => {
-        const effectiveValue = getFadEffectiveValueHelper(
-            def.key,
-            fadData[def.key],
-            def.isDisabledByCondizioniSpeciali,
-            isEnteInCondizioniSpeciali,
-            simulatoreRisultati,
-            incrementoEQconRiduzioneDipendenti
-        );
-        
-        const row = [
-            def.section.replace(/_/g, ' ').toUpperCase(),
-            def.description,
-            def.riferimento,
-            def.isSubtractor ? -effectiveValue : effectiveValue,
-            def.isRelevantToArt23Limit ? 'Sì' : 'No'
-        ];
-        rows.push(row);
+    const title = `Dettaglio Completo Fondo Accessorio Personale Dipendente ${annoRiferimento}`;
+    XLSX.utils.sheet_add_aoa(ws, [[title]], { origin: 'A1' });
+
+    const headers = ["Descrizione", "Riferimento Normativo", "Importo (€)"];
+    
+    let currentRow = 3;
+
+    const totals = calculateFadTotals(fadData, simulatoreRisultati, isEnteInCondizioniSpeciali, incrementoEQconRiduzioneDipendenti);
+
+    const sections = [
+        { title: "Fonti di Finanziamento Stabili", section: 'stabili', total: totals.sommaStabili_Dipendenti, totalLabel: "SOMMA RISORSE STABILI" },
+        { title: "Fonti di Finanziamento Variabili Soggette al Limite", section: 'vs_soggette', total: totals.sommaVariabiliSoggette_Dipendenti, totalLabel: "SOMMA RISORSE VARIABILI SOGGETTE AL LIMITE" },
+        { title: "Fonti di Finanziamento Variabili Non Soggette al Limite", section: 'vn_non_soggette', total: totals.sommaVariabiliNonSoggette_Dipendenti, totalLabel: "SOMMA RISORSE VARIABILI NON SOGGETTE AL LIMITE" },
+        { title: "Altre Risorse e Decurtazioni Finali", section: 'fin_decurtazioni', total: totals.altreRisorseDecurtazioniFinali_Dipendenti, totalLabel: "SOMMA ALTRE DECURTAZIONI" },
+    ];
+
+    sections.forEach(sec => {
+        XLSX.utils.sheet_add_aoa(ws, [[sec.title]], { origin: `A${currentRow}` });
+        ws[`A${currentRow}`].s = { font: { bold: true, sz: 14, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4F81BD" } } };
+        currentRow++;
+
+        XLSX.utils.sheet_add_aoa(ws, [headers], { origin: `A${currentRow}` });
+        ws[`A${currentRow}`].s = { font: { bold: true }, fill: { fgColor: { rgb: "DDEBF7" } } };
+        ws[`B${currentRow}`].s = { font: { bold: true }, fill: { fgColor: { rgb: "DDEBF7" } } };
+        ws[`C${currentRow}`].s = { font: { bold: true }, fill: { fgColor: { rgb: "DDEBF7" } } };
+        currentRow++;
+
+        fadFieldDefinitions.filter(def => def.section === sec.section).forEach(def => {
+            const effectiveValue = getFadEffectiveValueHelper(
+                def.key,
+                fadData[def.key],
+                def.isDisabledByCondizioniSpeciali,
+                isEnteInCondizioniSpeciali,
+                simulatoreRisultati,
+                incrementoEQconRiduzioneDipendenti
+            );
+
+            const rowData = [
+                def.description,
+                def.riferimento,
+                def.isSubtractor ? -effectiveValue : effectiveValue
+            ];
+            XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: `A${currentRow}` });
+            ws[`C${currentRow}`].t = 'n';
+            ws[`C${currentRow}`].z = '€ #,##0.00';
+            currentRow++;
+        });
+
+        XLSX.utils.sheet_add_aoa(ws, [[sec.totalLabel, "", sec.total]], { origin: `A${currentRow}` });
+        ws[`A${currentRow}`].s = { font: { bold: true } };
+        ws[`C${currentRow}`].s = { font: { bold: true }, numFmt: '€ #,##0.00' };
+        ws[`C${currentRow}`].t = 'n';
+        currentRow += 2;
     });
 
-    const escapeCsvCell = (cell: any) => {
-        if (cell === undefined || cell === null) return '';
-        let cellString = String(cell);
-        if (cellString.includes('"') || cellString.includes(',') || cellString.includes('\n')) {
-            cellString = '"' + cellString.replace(/"/g, '""') + '"';
-        }
-        return cellString;
-    };
+    XLSX.utils.sheet_add_aoa(ws, [["TOTALE RISORSE DISPONIBILI", "", totals.totaleRisorseDisponibiliContrattazione_Dipendenti]], { origin: `A${currentRow}` });
+    ws[`A${currentRow}`].s = { font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "C00000" } } };
+    ws[`C${currentRow}`].s = { font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "C00000" } }, numFmt: '€ #,##0.00' };
+    ws[`C${currentRow}`].t = 'n';
 
+    ws['!cols'] = [{ wch: 60 }, { wch: 40 }, { wch: 20 }];
 
-    let csvContent = headers.join(",") + "\n" 
-        + rows.map(row => row.map(escapeCsvCell).join(",")).join("\n");
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Dettaglio_Fondo_Dipendente_${annoRiferimento}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    XLSX.utils.book_append_sheet(wb, ws, "Dettaglio Fondo Personale");
+    XLSX.writeFile(wb, `Dettaglio_Fondo_Dipendente_${annoRiferimento}.xlsx`);
 };
