@@ -15,25 +15,6 @@ const formatCurrency = (value?: number) => {
   return `€ ${value.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
-const calculatePercentageChange = (current?: number, previous?: number) => {
-  if (previous === undefined || previous === 0 || current === undefined) {
-    return null;
-  }
-  const change = ((current - previous) / previous) * 100;
-  return change;
-};
-
-const renderPercentage = (change: number | null) => {
-  if (change === null) return null;
-  const isPositive = change > 0;
-  const color = isPositive ? 'text-green-500' : 'text-red-500';
-  return (
-    <span className={`text-sm ml-2 ${color}`}>
-      ({isPositive ? '+' : ''}{change.toFixed(1)}%)
-    </span>
-  );
-};
-
 export const DashboardSummary: React.FC<DashboardSummaryProps> = ({ calculatedFund, fundData, annoRiferimento }) => {
   if (!calculatedFund) {
     return (
@@ -43,32 +24,27 @@ export const DashboardSummary: React.FC<DashboardSummaryProps> = ({ calculatedFu
     );
   }
 
-  const prevYearData = fundData.historicalData[annoRiferimento - 1];
-
   const summaryItems = [
     {
       label: "Totale Componente Stabile",
-      value: formatCurrency(calculatedFund.summary.totaleParteStabile),
-      change: calculatePercentageChange(calculatedFund.summary.totaleParteStabile, prevYearData?.totaleParteStabile),
+      value: formatCurrency(calculatedFund.totaleComponenteStabile),
       important: true
     },
     {
       label: "Totale Componente Variabile",
-      value: formatCurrency(calculatedFund.summary.totaleParteVariabile),
-      change: calculatePercentageChange(calculatedFund.summary.totaleParteVariabile, prevYearData?.totaleParteVariabile),
+      value: formatCurrency(calculatedFund.totaleComponenteVariabile),
       important: true
     },
     {
       label: "TOTALE FONDO RISORSE DECENTRATE",
-      value: formatCurrency(calculatedFund.summary.totaleFondo),
-      change: calculatePercentageChange(calculatedFund.summary.totaleFondo, prevYearData?.totaleFondo),
+      value: formatCurrency(calculatedFund.totaleFondoRisorseDecentrate),
       veryImportant: true
     },
-    { label: "Ammontare Soggetto a Limite 2016", value: formatCurrency(calculatedFund.summary.importoLimite2016) },
+    { label: "Ammontare Soggetto a Limite 2016", value: formatCurrency(calculatedFund.ammontareSoggettoLimite2016) },
     {
       label: "Superamento Limite 2016",
-      value: calculatedFund.summary.superamentoLimite ? formatCurrency(calculatedFund.summary.superamentoLimite) : "Nessuno",
-      isAlert: !!calculatedFund.summary.superamentoLimite
+      value: calculatedFund.superamentoLimite2016 ? formatCurrency(calculatedFund.superamentoLimite2016) : "Nessuno",
+      isAlert: !!calculatedFund.superamentoLimite2016
     },
   ];
 
@@ -88,7 +64,6 @@ export const DashboardSummary: React.FC<DashboardSummaryProps> = ({ calculatedFu
                 item.important ? 'text-[#1b0e0e]' : 'text-[#1b0e0e]'
             }`}>
               {item.value}
-              {'change' in item && renderPercentage(item.change)}
             </p>
           </div>
         ))}

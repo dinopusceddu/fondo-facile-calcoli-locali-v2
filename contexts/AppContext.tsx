@@ -268,7 +268,7 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
         },
       };
     case 'CALCULATE_FUND_START':
-      return { ...state, isLoading: true, error: undefined };
+      return { ...state, isLoading: true, error: undefined, calculatedFund: undefined, complianceChecks: [] };
     case 'CALCULATE_FUND_SUCCESS':
       return { ...state, isLoading: false, calculatedFund: action.payload.fund, complianceChecks: action.payload.checks };
     case 'CALCULATE_FUND_ERROR':
