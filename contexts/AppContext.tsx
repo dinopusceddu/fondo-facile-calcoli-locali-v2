@@ -1,9 +1,9 @@
 // contexts/AppContext.tsx
-import React, { createContext, useReducer, Dispatch, useContext, useCallback } from 'react';
+import React, { createContext, useReducer, Dispatch, useContext, useCallback, useEffect } from 'react';
 import { AppState, AppAction, UserRole, FundData, CalculatedFund, ComplianceCheck, ProventoSpecifico, EmployeeCategory, Art23EmployeeDetail, SimulatoreIncrementoInput, FondoAccessorioDipendenteData, FondoElevateQualificazioniData, FondoSegretarioComunaleData, FondoDirigenzaData, SimulatoreIncrementoRisultati, PersonaleServizioDettaglio } from '../types.js';
 import { DEFAULT_CURRENT_YEAR, INITIAL_HISTORICAL_DATA, INITIAL_ANNUAL_DATA, DEFAULT_USER, INITIAL_FONDO_ACCESSORIO_DIPENDENTE_DATA, INITIAL_FONDO_ELEVATE_QUALIFICAZIONI_DATA, INITIAL_FONDO_SEGRETARIO_COMUNALE_DATA, INITIAL_FONDO_DIRIGENZA_DATA } from '../constants.js';
-import { calculateFundCompletely } from '../hooks/useFundCalculations.js'; 
-import { runAllComplianceChecks } from '../hooks/useComplianceChecks.js'; 
+import { calculateFundCompletely } from '../hooks/useFundCalculations.js';
+import { runAllComplianceChecks } from '../hooks/useComplianceChecks.js';
 
 const initialState: AppState = {
   currentUser: DEFAULT_USER,
@@ -11,9 +11,9 @@ const initialState: AppState = {
   fundData: {
     historicalData: INITIAL_HISTORICAL_DATA,
     annualData: {
-        ...INITIAL_ANNUAL_DATA,
-        personaleServizioDettagli: [], // Assicura che sia inizializzato
-    }, 
+      ...INITIAL_ANNUAL_DATA,
+      personaleServizioDettagli: [], // Assicura che sia inizializzato
+    },
     fondoAccessorioDipendenteData: INITIAL_FONDO_ACCESSORIO_DIPENDENTE_DATA,
     fondoElevateQualificazioniData: INITIAL_FONDO_ELEVATE_QUALIFICAZIONI_DATA,
     fondoSegretarioComunaleData: INITIAL_FONDO_SEGRETARIO_COMUNALE_DATA,
@@ -23,7 +23,7 @@ const initialState: AppState = {
   complianceChecks: [],
   isLoading: false,
   error: undefined,
-  activeTab: 'benvenuto', 
+  activeTab: 'benvenuto',
 };
 
 const AppContext = createContext<{
@@ -38,6 +38,8 @@ const AppContext = createContext<{
 
 const appReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
+    case 'SET_STATE':
+      return { ...state, ...action.payload };
     case 'SET_USER':
       return { ...state, currentUser: action.payload };
     case 'SET_CURRENT_YEAR':
@@ -282,8 +284,31 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
   }
 };
 
+const useAutoSave = (state: AppState) => {
+  useEffect(() => {
+    try {
+      localStorage.setItem('appState', JSON.stringify(state));
+    } catch (error) {
+      console.error("Failed to save state to localStorage", error);
+    }
+  }, [state]);
+};
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
+
+  useEffect(() => {
+    try {
+      const savedState = localStorage.getItem('appState');
+      if (savedState) {
+        dispatch({ type: 'SET_STATE', payload: JSON.parse(savedState) });
+      }
+    } catch (error) {
+      console.error("Failed to load state from localStorage", error);
+    }
+  }, []);
+
+  useAutoSave(state);
 
   const performFundCalculation = useCallback(async () => {
     dispatch({ type: 'CALCULATE_FUND_START' });
