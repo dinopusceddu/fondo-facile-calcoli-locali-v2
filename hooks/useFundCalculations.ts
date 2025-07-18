@@ -1,5 +1,6 @@
 // hooks/useFundCalculations.ts
 import { FundData, CalculatedFund, FundComponent, EmployeeCategory } from '../types.js';
+import { calculateFadTotals } from '../pages/FondoAccessorioDipendentePageHelpers.js';
 import {
   VALORE_PROCAPITE_ART67_CCNL2018,
   VALORE_PROCAPITE_ART79_CCNL2022_B,
@@ -135,59 +136,16 @@ export const calculateFundCompletely = (fundData: FundData): CalculatedFund => {
     };
   }
 
-  const totaleIncrementiStabiliCCNL = incrementiStabiliCCNL.reduce((sum, item) => sum + item.importo, 0);
-  const totaleComponenteStabile = fondoBase2016_originale + 
-                                  totaleIncrementiStabiliCCNL + 
-                                  adeguamentoProCapite.importo + 
-                                  (incrementoDeterminatoArt23C2?.importo || 0) + 
-                                  (incrementoOpzionaleVirtuosi?.importo || 0);
+  const fadTotals = calculateFadTotals(
+    fondoAccessorioDipendenteData || {},
+    annualData.simulatoreRisultati,
+    !!annualData.isEnteDissestato || !!annualData.isEnteStrutturalmenteDeficitario || !!annualData.isEnteRiequilibrioFinanziario,
+    fondoElevateQualificazioniData?.ris_incrementoConRiduzioneFondoDipendenti
+  );
 
-  // --- RISORSE VARIABILI (Calcolo Globale) ---
-  const risorseVariabili: FundComponent[] = [];
-  const proventiArt45 = annualData.proventiSpecifici.find(p => p.riferimentoNormativo === RIF_ART45_DLGS36_2023);
-  if (proventiArt45 && proventiArt45.importo && proventiArt45.importo > 0) {
-    risorseVariabili.push({
-      descrizione: "Incentivi funzioni tecniche",
-      importo: proventiArt45.importo,
-      riferimento: RIF_ART45_DLGS36_2023,
-      tipo: 'variabile',
-      esclusoDalLimite2016: true, 
-    });
-  }
-  const proventiArt208 = annualData.proventiSpecifici.find(p => p.riferimentoNormativo === RIF_ART208_CDS);
-  if (proventiArt208 && proventiArt208.importo && proventiArt208.importo > 0) {
-    risorseVariabili.push({
-      descrizione: "Proventi Codice della Strada (quota destinata)",
-      importo: proventiArt208.importo,
-      riferimento: RIF_ART208_CDS,
-      tipo: 'variabile',
-      esclusoDalLimite2016: false, 
-    });
-  }
-  annualData.proventiSpecifici.filter(p => p.riferimentoNormativo !== RIF_ART45_DLGS36_2023 && p.riferimentoNormativo !== RIF_ART208_CDS).forEach(p => {
-    if (p.importo && p.importo > 0) {
-        risorseVariabili.push({
-            descrizione: p.descrizione,
-            importo: p.importo,
-            riferimento: p.riferimentoNormativo,
-            tipo: 'variabile',
-            esclusoDalLimite2016: false 
-        });
-    }
-  });
-  if (annualData.condizioniVirtuositaFinanziariaSoddisfatte && annualData.incentiviPNRROpMisureStraordinarie && annualData.incentiviPNRROpMisureStraordinarie > 0) {
-    const limitePNRR = fondoBase2016_originale * LIMITE_INCREMENTO_PNRR_DL13_2023;
-    const importoEffettivoPNRR = Math.min(annualData.incentiviPNRROpMisureStraordinarie, limitePNRR);
-    risorseVariabili.push({
-      descrizione: "Incremento variabile PNRR/Misure Straordinarie (fino a 5% del fondo stabile 2016 originale)",
-      importo: importoEffettivoPNRR,
-      riferimento: RIF_ART8_DL13_2023, 
-      tipo: 'variabile',
-      esclusoDalLimite2016: true, 
-    });
-  }
-  
-  const totaleComponenteVariabile = risorseVariabili.reduce((sum, item) => sum + item.importo, 0);
+  const totaleComponenteStabile = fadTotals.sommaStabili_Dipendenti;
+  const totaleComponenteVariabile = fadTotals.sommaVariabiliSoggette_Dipendenti + fadTotals.sommaVariabiliNonSoggette_Dipendenti;
+  const risorseVariabili: FundComponent[] = []; // Placeholder, as the detailed components are not needed for the summary
   const totaleFondoRisorseDecentrate = totaleComponenteStabile + totaleComponenteVariabile;
 
   const limiteArt23C2Modificato = fondoBase2016_originale + (incrementoDeterminatoArt23C2?.importo || 0);
