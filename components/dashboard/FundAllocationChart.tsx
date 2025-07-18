@@ -12,8 +12,8 @@ const FundAllocationChart: React.FC = () => {
     return <Card title="Ripartizione Fondo"><p>Dati non disponibili. Esegui prima il calcolo.</p></Card>;
   }
 
-  const parteStabile = calculatedFund.summary.totaleParteStabile;
-  const parteVariabile = calculatedFund.summary.totaleParteVariabile;
+  const parteStabile = calculatedFund.totaleComponenteStabile;
+  const parteVariabile = calculatedFund.totaleComponenteVariabile;
   const totalFund = parteStabile + parteVariabile;
 
   const data = [
